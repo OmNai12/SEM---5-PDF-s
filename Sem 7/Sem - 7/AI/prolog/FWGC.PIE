@@ -1,0 +1,66 @@
+/*
+   Copyright (c) 1986, 88 by Borland International, Inc
+   
+   See also the program FWGC.PRO on the directory \PROGRAMS
+*/
+
+DOMAINS
+  LOC   = east ; west
+  STATE = state(LOC,LOC,LOC,LOC)
+  PATH  = STATE*
+  
+PREDICATES
+  go
+  go(STATE,STATE)
+  path(STATE,STATE,PATH,PATH)
+  move(STATE,STATE)
+  opposite(LOC,LOC)
+  unsafe(STATE)
+  member(STATE,PATH)
+  write_path(PATH)
+  write_move(STATE,STATE)
+
+CLAUSES
+*/
+  go:-	go(state(east,east,east,east),state(west,west,west,west)).
+
+  go(S,G):-
+  	path(S,G,[S],L),
+  	nl,write("A solution is:"),nl,
+  	write_path(L),
+  	fail.
+ go(_,_).
+
+  path(S,G,L,L1):-
+	move(S,S1),
+	not( unsafe(S1) ),
+	not( member(S1,L) ),
+	path( S1,G,[S1|L],L1),!.
+  path(G,G,T,T):-!.   /* The final state is reached  */
+                    
+  move(state(X,X,G,C),state(Y,Y,G,C)):-opposite(X,Y). /* FARMER + WOLF    */
+  move(state(X,W,X,C),state(Y,W,Y,C)):-opposite(X,Y). /* FARMER + GOAT    */
+  move(state(X,W,G,X),state(Y,W,G,Y)):-opposite(X,Y). /* FARMER + CABBAGE */
+  move(state(X,W,G,C),state(Y,W,G,C)):-opposite(X,Y). /* ONLY FARMER	  */
+
+  opposite(east,west).
+  opposite(west,east).
+
+  unsafe( state(F,X,X,_) ):- opposite(F,X).  /* The wolf eats the goat    */
+  unsafe( state(F,_,X,X) ):- opposite(F,X).  /* The goat eats the cabbage */
+  
+  member(X,[X|_]).
+  member(X,[_|L]):-member(X,L).
+
+  write_move( state(X,W,G,C), state(Y,W,G,C) ) :-!,
+	write("The farmer crosses the river from ",X," to ",Y),nl.
+  write_move( state(X,X,G,C), state(Y,Y,G,C) ) :-!,
+	write("The farmer takes the Wolf from ",X," of the river to ",Y),nl.
+  write_move( state(X,W,X,C), state(Y,W,Y,C) ) :-!,
+	write("The farmer takes the Goat from ",X," of the river to ",Y),nl.
+  write_move( state(X,W,G,X), state(Y,W,G,Y) ) :-!,
+	write("The farmer takes the cabbage from ",X," of the river to ",Y),nl.
+
+  write_path( [H1,H2|T] ) :- !,
+	write_move(H1,H2),write_path([H2|T]).
+  write_path( _ ).

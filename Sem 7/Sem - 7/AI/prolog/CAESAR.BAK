@@ -1,0 +1,33 @@
+/*Ng Chen Hai
+*/
+domains
+	ID,PASS=string.
+predicates
+	userid.
+	password.
+	check1(symbol).
+	check2(symbol).
+goal
+	makewindow(3,11,37," Old Song Lyrics",1,1,23,75),
+	userid.
+	
+clauses
+	userid:-write("User ID > "),
+		readln(ID),
+		check1(ID).
+	password:-write("Password > "),
+		readln(PASS),
+		check2(PASS),
+		clearwindow.
+	check1(ID):-
+		ID="KTAR",
+		password;
+		write("Incorrect User ID!!"),nl,nl,
+		clearwindow,
+		userid.
+	check2(PASS):-
+		PASS="KTAR",
+		clearwindow;
+		write("Incorrect Password!!"),nl,nl,
+		password.
+		

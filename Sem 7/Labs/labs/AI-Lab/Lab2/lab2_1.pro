@@ -1,0 +1,45 @@
+domains
+	name,indication,disease_name=symbol
+predicates
+	symptom(name,indication)
+	disease(name,disease_name)
+clauses
+	symptom(parva,fever).
+	symptom(parva,rash).
+	symptom(parva,headache).
+	symptom(parva,runny_nose).
+	symptom(vidhi,chills).
+	symptom(vidhi,fever).
+	symptom(vidhi,headache).
+	symptom(vivan,runny_nose).
+	symptom(vivan,rash).
+	symptom(vivan,flu).
+	disease(Patient,measles):-
+		symptom(Patient,fever),
+		symptom(Patient,cough),
+		symptom(Patient,conjuctivitis),
+		symptom(Patient,rash).
+	disease(Patient,german_measles):-
+		symptom(Patient,fever),
+		symptom(Patient,headache),
+		symptom(Patient,runny_nose),
+		symptom(Patient,rash).
+	disease(Patient,flu):-
+		symptom(Patient,fever),
+		symptom(Patient,headache),
+		symptom(Patient,body_ache),
+		symptom(Patient,chills).
+	disease(Patient,common_cold):-
+		symptom(Patient,headache),
+		symptom(Patient,sneezing),
+		symptom(Patient,sore_throat),
+		symptom(Patient,chills),
+		symptom(Patient,runny_nose).
+	disease(Patient,mumps):-
+		symptom(Patient,fever),
+		symptom(Patient,swollen_glands).
+	disease(Patient,chiken_pox):-
+		symptom(Patient,fever),
+		symptom(Patient,rash),
+		symptom(Patient,body_ache),
+		symptom(Patient,chills).

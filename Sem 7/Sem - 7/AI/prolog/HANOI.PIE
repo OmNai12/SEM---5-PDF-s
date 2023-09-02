@@ -1,0 +1,29 @@
+/******************************************************************
+		 Towers of hanoi
+
+   Copyright (c) 1986, 88 by Borland International, Inc
+******************************************************************/
+/*
+DOMAINS
+  POLE = SYMBOL
+
+PREDICATES
+  hanoi
+  hanoi(INTEGER)
+  move(INTEGER,POLE,POLE,POLE)
+  inform(POLE,POLE)
+
+CLAUSES
+*/
+  hanoi:-hanoi(5).
+
+  hanoi(N) :- move(N, left, middle, right).
+
+  move(1, A, _, C) :- inform(A, C), !.
+  move(N, A, B, C) :-
+	N1 is N-1,
+	move(N1, A, C, B),
+	inform(A, C), !,
+	move(N1, B, A, C).
+
+  inform(Loc1, Loc2) :-  write("Move a disk from ", Loc1, " to ", Loc2),nl, !.

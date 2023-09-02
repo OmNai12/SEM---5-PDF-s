@@ -1,0 +1,91 @@
+/*****************************************************************************
+			Prolog Inference Engine
+			=======================
+
+   Copyright (c) 1986, 88 by Borland International, Inc
+
+   Module PIE.OUT: The term writer
+*****************************************************************************/
+
+PREDICATES
+  wterm(DISPLAY,TERM)
+  wterm(DISPLAY,STERM)
+  wterml(DISPLAY,TERML)
+  wterml(DISPLAY,STERML)
+  wcmp(DISPLAY,REFSYMB,TERML)
+  wcmp(DISPLAY,STRING,STERML)
+  wop(DISPLAY,PRIOR,XFY,OP,TERML)
+  wop(DISPLAY,PRIOR,XFY,OP,STERML)
+  wleft(DISPLAY,ASSOC,PRIOR,STERM)
+  wleft(DISPLAY,ASSOC,PRIOR,TERM)
+  wright(DISPLAY,ASSOC,PRIOR,TERM)
+  wright(DISPLAY,ASSOC,PRIOR,STERM)
+  prefix(XFY,ASSOC)
+  suffix(XFY,ASSOC)
+  infix(XFY,ASSOC,ASSOC)
+  brackets_needed(ASSOC,PRIOR,TERM)
+  brackets_needed(ASSOC,PRIOR,STERM)
+  wlist(DISPLAY,TERM)
+  wlist(DISPLAY,STERM)
+
+CLAUSES
+  wterm(_,TERM):-free(TERM),!,write('_').
+  wterm(_,int(X)):-!,write(X).
+  wterm("write",str(X)):-!,write(X).
+  wterm(_,str(X)):-!,write('"',X,'"').
+  wterm("write",char(X)):-!,write(X).
+  wterm(_,char(X)):-!,write('`',X).
+  wterm(_,atom(X)):-!,write(X).
+  wterm(_,var(X)):-!,write(X).
+  wterm(_,nill):-!,write("[]").
+  wterm(DISPLAY,list(HEAD,TAIL)):-!,
+	write('['),wlist(DISPLAY,list(HEAD,TAIL)),write(']').
+  wterm(DISPLAY,cmp(FID,TERML)):-wcmp(DISPLAY,FID,TERML).
+
+  wcmp(DISPLAY,FID,TERML):-
+	DISPLAY><"display",
+	OP=FID,op(PRIOR,ASSOC,OP),
+	wop(DISPLAY,PRIOR,ASSOC,OP,TERML),!.
+  wcmp(DISPLAY,FID,TERML):-write(FID,'('),wterml(DISPLAY,TERML),write(')').
+
+  prefix(fx,x).	prefix(fy,y).
+
+  suffix(xf,x).	suffix(yf,y).
+
+  infix(xfx,x,x). infix(xfy,x,y). infix(yfx,y,x). infix(yfy,y,y).
+
+  wop(DISPLAY,PRIOR,ASSOC,OP,[TERM]):-prefix(ASSOC,XY),!,
+	write(OP),wright(DISPLAY,XY,PRIOR,TERM).
+  wop(DISPLAY,PRIOR,ASSOC,OP,[TERM]):-suffix(ASSOC,XY),!,
+	wleft(DISPLAY,XY,PRIOR,TERM),write(OP).
+  wop(DISPLAY,PRIOR,ASSOC,OP,[TERM1,TERM2]):-infix(ASSOC,LEFT_XY,RIGHT_XY),
+	wleft(DISPLAY,LEFT_XY,PRIOR,TERM1),
+	write(OP),
+	wright(DISPLAY,RIGHT_XY,PRIOR,TERM2).
+
+  brackets_needed(_,PRIOR,TERM):-
+	bound(TERM),TERM=cmp(FID,_),
+	OP=FID, op(PRIOR1,_,OP), PRIOR1>PRIOR,!.
+  brackets_needed(x,PRIOR,TERM):-
+	bound(TERM),TERM=cmp(FID,_),
+	OP=FID, op(PRIOR,_,OP),!.
+
+  wright(DISPLAY,XY,PRIOR,TERM):-
+	brackets_needed(XY,PRIOR,TERM),!,
+	write(" ("),wterm(DISPLAY,TERM),write(')').
+  wright(DISPLAY,_,_,TERM):-write(' '),wterm(DISPLAY,TERM).
+
+  wleft(DISPLAY,XY,PRIOR,TERM):-
+	brackets_needed(XY,PRIOR,TERM),!,
+	write('('),wterm(DISPLAY,TERM),write(") ").
+  wleft(DISPLAY,_,_,TERM):-wterm(DISPLAY,TERM),write(' ').
+
+  wterml(_,[]):-!.
+  wterml(DISPLAY,[H]):-!,wterm(DISPLAY,H).
+  wterml(DISPLAY,[H|T]):-wterm(DISPLAY,H),write(','),wterml(DISPLAY,T).
+
+  wlist(_,nill):-!.
+  wlist(DISPLAY,list(H,T)):-free(T),!,wterm(DISPLAY,H),write("|_").
+  wlist(DISPLAY,list(H,var(VAR))):-!,wterm(DISPLAY,H),write("|"),write(VAR).
+  wlist(DISPLAY,list(H,nill)):-!,wterm(DISPLAY,H).
+  wlist(DISPLAY,list(H,T)):-wterm(DISPLAY,H),write(','),wlist(DISPLAY,T).

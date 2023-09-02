@@ -1,0 +1,49 @@
+Erosion (A - B)
+- place the structuring element over the image, if all the ones in the 
+se match with the image then put a 1 in the centre else put a 0.
+-shrinks the one
+Eg: 
+	0 0 0 0 0			0 0 0 0 0
+	0 1 1 1 0   	0 1 0		0 0 0 0 0
+	0 1 1 1 0	1 1 1		0 0 1 0 0
+	0 1 1 1 0	0 1 0		0 0 0 0 0
+	0 0 0 0 0			0 0 0 0 0
+	Image 		SE		Eroded Image
+
+
+Dilation (A + B)
+- Place the structuring element over the image, if atleast one matches
+replace the centre with 1.
+-Expands the image
+
+0 1 1 1 0
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+0 1 1 1 0
+
+Opening: Erosion followed by dilation(OED)
+Removes small borders and smoothen the boundaries
+
+Closing: Dilation followed by erosion (ODC)
+fills small opening, connects disconnected objects
+
+Boundary Extraction: Process of extracting the boundary
+A - (A errosion B)
+
+Region Filling
+SE always:	0 1 0
+		1 1 1		4 connecting structuring element
+		0 1 0
+X0 = A
+X1 = (X0 dilation B) intersection A compliment
+
+Connected Components:
+SE: either 8 or 4 connecting structuring element
+X0 = A
+X1 = (X0 dilation B) intersection A  
+
+Hit and Miss Transform
+- extract pixels with specific neighbourhood
+
+Convex Hull: Polygon created using connecting all 1s.

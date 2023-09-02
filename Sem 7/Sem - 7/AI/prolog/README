@@ -1,0 +1,723 @@
+                 WELCOME TO TURBO PROLOG VERSION 2.0
+                 -----------------------------------
+
+  This README file contains necessary information about Turbo
+  Prolog Version 2.0 that is not included in the documentation at 
+  this time.  Please read this file in its entirety and refer to 
+  it if you have any questions.
+
+
+TABLE OF CONTENTS
+-----------------
+ 1.  How to Contact Technical Support
+ 2.  Installing Turbo Prolog 2.0
+ 3.  Files on the Distribution Disks
+ 4.  Where to find the differences between 1.x and 2.0
+     (and updating the TOOLBOX)
+ 5.  Enabling high-resolution EGA+ text modes
+ 6.  Important Information
+ 7.  Compiling on a Two-Floppy Drive System
+ 8.  How to Unpack/De-archive .ARC Files
+ 9.  Converting .BGI files to .OBJ Files
+10.  Where to find the 1.1 Graphics Predicates
+11.  Corrections to Appendix C Error Messages
+
+
+1.  HOW TO CONTACT TECHNICAL SUPPORT
+------------------------------------
+  If you have any problems, please read this file and the Turbo
+  Prolog manuals first.  If you still have a question and need
+  assistance, help is available from the following sources:
+
+    1.  Type GO BPROGB on the CompuServe bulletin board system
+        for instant access to the Borland forums with their
+        libraries of technical information and answers to common
+        questions.
+
+        If you are not a member of CompuServe, see the enclosed
+        special offer, and write for full details on how to
+        receive a free IntroPak containing a $15 credit toward
+        your first month's on-line charges.
+
+    2.  Check with your local software dealer or users' group.
+
+    3.  Write to us at the following address:
+
+            Borland International
+            Turbo Prolog Technical Support
+            1800 Green Hills Road
+            P.O. Box 660001
+            Scotts Valley, CA  95066
+
+        Please remember to include your serial number or we
+        will be unable to process your letter.
+
+    4.  If you have an urgent problem that can't wait and you have
+        sent in the license agreement from the front of your
+        manual, you may call the Borland Technical Support
+        Department at (408) 438-5300.  Please have the following
+        information ready before calling:
+
+          a.  Product name and serial number on your original
+              distribution disk.  Please have your serial number
+              ready or we will be unable to process your call.
+
+          b.  Product version number.  The version number for Turbo
+              Prolog is displayed when you first load the program
+              and before you press any keys.
+
+          c.  Computer brand, model, and the brands and model numbers
+              of any additional hardware.
+
+          d.  Operating system and version number. (The version number
+              can be determined by typing VER at the MSDOS prompt.)
+
+          e.  Contents of your AUTOEXEC.BAT file.
+
+          f.  Contents of your CONFIG.SYS file.
+
+
+2.  INSTALLING TURBO PROLOG 2.0
+-------------------------------
+
+                           HARD DISK USERS
+                           ---------------
+  To install Turbo Prolog, enter the following command at the DOS
+  prompt (if your floppy is not in drive A, just substitute your
+  drive wherever you see A:).  Make sure that the hard disk is the
+  DEFAULT DRIVE.  You CANNOT install Turbo Prolog 2.0 if the default
+  drive is A: or B:!
+
+  At the DOS prompt for your HARD DISK enter:
+
+     A:INSTALL A: C:\PROLOG
+
+
+                          FLOPPY DISK USERS
+                          -----------------
+  If you're using a two-floppy drive system, you have a choice of
+  copying the reference examples (REFEXAMP.ARC) or not.  If you
+  DO want to copy them, use this command:
+
+     INSTALL A: B: y
+
+  If you DO NOT want to copy them, use the following command:
+
+     INSTALL A: B: n
+
+
+                   HARD DISK AND FLOPPY DISK USERS
+                   -------------------------------
+  The first install parameter (A:) specifies the floppy disk
+  drive that contains your master disk.  The second parameter
+  (C:\PROLOG or B:) specifies the full path name of the drive
+  (and subdirectory if you're a hard disk user) where you want to
+  install Turbo Prolog (unless it conflicts with another
+  directory, we suggest you use \PROLOG.).  You should NOT add a
+  trailing "\" to these parameters.
+
+  For two-floppy drive users, the third argument (y or n) specifies
+  whether you want the reference examples to be copied to your disks.
+
+  The installation program will create the following directories
+  on your hard disk (assuming you are installing in the \PROLOG
+  directory):
+
+  C:\PROLOG           Main Turbo Prolog directory, compiler, utilities
+  C:\PROLOG\ANSWERS   Answers to exercises in the tutorial
+  C:\PROLOG\BGI       Borland Graphics Interface programs and utilities
+  C:\PROLOG\EXAMPLES  Example programs from the Prolog tutorial
+  C:\PROLOG\PIE       Prolog Inference Engine
+  C:\PROLOG\PROGRAMS  Various demonstration programs
+  C:\PROLOG\REFEXAMP  Examples of predicate usage from the reference
+                      guide
+
+  For two-floppy drive users, the installation program will create 
+  the same directories, only on different disks.  (Except the BGI and 
+  PROGRAMS directories; the files in these directories are simply 
+  placed in the root directory of the disk they are on.)
+
+  After creating these directories, the program will copy your files
+  from your master disks onto your hard disk (or your floppy disks).
+  Because Turbo Prolog 2.0 comes on more than one disk, during this
+  process you will be instructed to change disks before continuing. 
+  Just follow the directions and you will be on your way.
+
+
+  INSTALL.BAT:
+
+  INSTALL.BAT is the batch file that starts the installation process.
+  You MUST use INSTALL.BAT to install Turbo Prolog 2.0.  If you try
+  and use INSTALLH.BAT or INSTALLF.BAT, the installation will NOT be
+  done properly.
+
+  For hard disk users, INSTALL.BAT calls INSTALLH.BAT, which will
+  prompt you through the installation procedure.
+
+  If you have a two-floppy drive system, INSTALL.BAT will call
+  INSTALLF.BAT, which will prompt you through the setup of your
+  floppy disks.
+
+  INSTALLH.BAT:
+
+  INSTALLH.BAT will unpack and copy the example programs packed in the
+  files EXAMPLES.ARC, ANSWERS.ARC, PIE.ARC and REFEXAMP.ARC.
+
+  EXAMPLES.ARC contains archived examples from the tutorial
+  ANSWERS.ARC  contains archived answers to exercises from the tutorial 
+  PIE.ARC      contains the Prolog Inference Engine, example programs 
+  REFEXAMP.ARC contains the archived examples from the Reference Guide
+
+  INSTALLH.BAT will also copy the README (this file) into the PROLOG
+  directory.
+
+  After that, INSTALLH.BAT copies the Prolog system into the PROLOG
+  directory.  Then INSTALLH.BAT will unpack and copy the file
+  PROGRAMS.ARC into the PROGRAMS directory.  PROGRAMS.ARC contains
+  advanced Prolog programs.
+
+  Next, it copies PROLOG.LIB, PROLOG.ERR, PROLOG.HLP, PROLOG.OVL, and
+  INIT.OBJ into the PROLOG directory.
+
+  Next INSTALLH.BAT copies the BGI files into the BGI directory.
+
+  INSTALLH.BAT instructs you to add these two settings
+
+     FILES=20
+     BUFFERS=40
+
+  to your CONFIG.SYS file.
+
+  INSTALLF.BAT:
+
+  This program builds 5 (or 6) working disks:
+
+  Disk 1. The Boot Disk ...      contains:  PROLOG.EXE
+                                            BGI.LIB
+                                            BGIOBJ.EXE
+
+  Disk 2. The Run Disk  ...      contains:  PROLOG.OVL
+                                            PROLOG.ERR
+                                            PROLOG.HLP
+                                            BGI files
+                                            OLD.SYS
+
+  Disk 3. The Library Disk ...   contains:  PROLOG.LIB
+                                            INIT.OBJ
+                                            TLIB.EXE
+                                            TLINK.EXE
+
+  Disk 4. The Examples Disk ...  contains:  EXAMPLES (directory)
+                                            ANSWERS  (directory)
+                                            PIE      (directory)
+
+                 EXAMPLES           contains the example programs
+                                    from the Prolog tutorial.
+
+                 ANSWERS            contains the answers to the
+                                    exercises in the tutorial.
+
+                 PIE                A Prolog Inference engine and
+                                    examples that run in PIE. 
+                                    (See Appendix K for a complete
+                                    description.)
+
+  Disk 5. The Programs Disk ...  contains:
+                 GENI.*             Simple classification expert
+                                    system
+                 SEN_AN.*           English Sentence Parser
+                 REGISTER.*         External database application
+                 GEOBASE.*          Natural language query system
+                 GRDEMO.PRO         BGI demo
+
+          and other programs including:
+                 MENU2.PRO          Menu utility program
+                 DIFF.PRO           Symbolic differentiation
+                 MONSTERS.PRO       Video Arcade Game by Borland
+                 FWGC.PRO           Logic example:  Farmer, Wolf,
+                                    Goat, and Cabbage
+                 HANOI.PRO          Towers of Hanoi
+                 D_CURVE.PRO        BGI example of Dragon Curve
+                 
+  Disk 6. The Refexamp Disk (optional) contains: REFEXAMP (directory)
+
+                   REFEXAMP         These are examples for all built-in
+                                    predicates from the Reference Guide.
+                                    Some are small programs, while
+                                    others are examples of the results 
+                                    returned.
+
+
+3.  FILES ON THE DISTRIBUTION DISKS
+-----------------------------------
+
+  DISK 1:  INSTALLATION/README
+  ----------------------------
+
+  README   COM  - Program to display README file
+  INSTALL  BAT  - Batch file to install Turbo Prolog
+  INSTALLH BAT  - Batch file to install Turbo Prolog on a hard disk
+  INSTALLF BAT  - Batch file to install Turbo Prolog on a two-
+                  floppy drive system
+  EXAMPLES ARC  - Archived file containing all the programs used in
+                  the Tutorial portion of the User's Guide
+    CHccEXnn PRO  -  cc is the chapter number, nn is the example number.
+                     For instance, the program CH03EX02.PRO corresponds 
+                     to Chapter 3, Example 2.
+    CHccEXnn C    -  C programs used in demonstrating how to interface 
+                     Turbo Prolog programs with Turbo C programs
+
+  ANSWERS  ARC  - Archived file containing answers to the exercises
+                  in the manual
+    ANS_nnn  PRO  -  nnn corresponds to the page number of the
+                     exercise
+
+  REFEXAMP ARC  - Archived file containing the example programs
+                  in the reference guide
+
+  PROGRAMS ARC  - Archived file containing the following example
+                  programs:
+    DIFF     *    -  Example of symbolic differentiation
+    D_CURVE  PRO  -  Displays dragon curve
+    FWGC     PRO  -  Example program that plays the Farmer, Goat, Wolf
+                     and Cabbage game
+    GENI     *    -  Small example of an expert system shell
+    VACATION GNI  -  Database file used by GENI.PRO
+    GEOBASE  *    -  Example Geography Database program
+    GRAPDECL PRO  -  Constant declarations necessary when
+                     using the BGI graphics
+    GRDEMO   PRO  -  Example program demonstrating the BGI graphics
+    HANOI    PRO  -  Sample program demonstrating a solution to the
+                     Towers of Hanoi
+    MIXTURE  PRO  -  Example program implementing several
+                     useful predicates
+    RANDOM   PRO  -  Example program that demonstrates the RANDOM
+                     predicate
+    SEN_AN   *    -  Sentence analyzer
+    TDOMS    PRO  -  Domain file used by GENI, SANAL, GEOBASE, and
+                     REGISTER
+    TPREDS   PRO  -  Predicates file used by GENI, SANAL, GEOBASE,
+                     and REGISTER
+    TRAPTEST PRO  -  Example of the trap predicate
+
+    FILES IN THE REGISTER PROJECT:
+    BROWSER  PRO  - Database browser module
+    GLOBALS  PRO  - Global declarations
+    LINEINP  PRO  - Line input program
+    MAIN     PRO  - Main program in the register database project
+    MENU2    PRO  - General purpose menu system used by GENI,
+                    SEN_AN, GEOBASE, and REGISTER
+    PRNHND   PRO  - Printer handler
+    REFSHND  PRO  - Screen handler header
+    REGISTER BIN  - Register database module
+    REGISTER LOG  - Register database module
+    REGISTER PRJ  - Register project file
+    REGISTER ZUP  - Register database module
+    REGISTER SYM  - REGISTER symbol table file
+    SCRHND   OBJ  - Screen handling file
+
+    DEMO PROGRAMS FROM THE MANUAL TESTING THE EXTERNAL DATABASE:
+    NDXTEST  PRO  - Index test example
+    LISTDBA  PRO  - List Database example
+    DBATEST  PRO  - External database test program
+    DUMPDBA  PRO  - Database to text dump example
+
+  PIE    ARC  - Archived file containing the following example
+                programs:
+    PIE      *    -  Prolog Inference Engine
+    *        PIE  -  Example Prolog programs that run in PIE
+  UNPACK   COM  - Utility used to de-archive .ARC files
+  README        - This text file
+
+  DISK 2:  COMPILER
+  -----------------
+
+  INSTALLF BAT  - Batch file to install Turbo Prolog on a two-floppy 
+                  drive system
+  PROLOG   EXE  - Turbo Prolog Compiler
+  BGI      LIB  - A library of BGI drivers and fonts
+  BGIOBJ   EXE  - BGI file conversion utility
+
+  DISK 3:  HELP/BGI
+  -----------------
+
+  INSTALLF BAT  - Batch file to install Turbo Prolog on a two-floppy    
+                  drive system
+  PROLOG   ERR  - Error messages
+  PROLOG   HLP  - Turbo Prolog help text
+  PROLOG   OVL  - Overlay file needed when starting Turbo Prolog and
+                  when creating .EXE files
+  ATT      BGI  - Driver for the AT&T 6300
+  CGA      BGI  - Driver for the IBM CGA (Color Graphics Adapter)
+                  and compatibles
+  EGAVGA   BGI  - Driver for the IBM EGA (Enhanced Graphics Adapter)
+                  and VGA (Video Graphics Array)
+  HERC     BGI  - Driver for the Hercules Graphics Card
+  PC3270   BGI  - Driver for the IBM PC 3270 Graphics Card
+  IBM8514  BGI  - Driver for the IBM 8514 Monitor
+  GOTH     CHR  - Gothic Font
+  LITT     CHR  - Small Font
+  SANS     CHR  - Sans Serif Font
+  TRIP     CHR  - Triplex Font
+  OLD      SYS  - Configuration file that emulates Turbo Prolog 1.1
+                  User Interface
+
+  DISK 4:  LIBRARY
+  ----------------
+
+  INSTALLF BAT  - Batch file to install Turbo Prolog on a two-floppy 
+                  drive system
+  PROLOG   LIB  - Library file needed when linking .OBJ files to
+                  create .EXE files
+  INIT     OBJ  - Code required when linking
+  TLINK    EXE  - The Turbo linker
+  TLIB     EXE  - The Turbo library manager
+
+
+4.  WHERE TO FIND THE DIFFERENCES BETWEEN 1.x AND 2.0
+    (AND UPDATING THE TOOLBOX)
+-----------------------------------------------------
+  Listed in Appendix D in the Reference Guide are the following:
+
+  COMPILING 1.x PROGRAMS IN 2.0
+  ENHANCEMENTS IN TURBO PROLOG 2.0
+  CHANGES TO THE SYSTEM
+  CHANGES TO THE LANGUAGE
+  NEW STANDARD PREDICATES
+
+
+  The instructions in Appendix D on changing a 1.x program to run
+  under 2.0 also apply to the programs in the Turbo Prolog
+  Toolbox 1.0.  In addition, you must make the following changes to
+  the programs in the Toolbox:
+
+   Tools:
+
+      GDOMS.PRO      - Change: "domains" to "global domains"
+      GGLOBS.PRO     - Change: "ellipse" to "ellipse_"
+                       Add   : ' as "ellipse" ' to the declaration
+      RESIZE.PRO     - Not needed.  Now a built-in predicate
+      SCRHND.PRO     - Change: "trunc" to "trunc_", 4 occurrences
+      VSCRHND.PRO    - Change: "trunc" to "trunc_", 4 occurrences
+      Parser Generator:
+        1. Make a copy of TDOMS.PRO called GLOBDOMS.PRO
+        2. In GLOBDOMS.PRO change:
+                     - domains to global domains
+        3. In PARSER.DEF change:
+                     - include "tdoms.pro" to include "globdoms.pro"
+                     - domains to global domains
+                     - database to global database
+
+   Demo:
+
+      XGEOMETR.PRO   - Change: "ellipse" to "ellipse_"
+      XLABEL.PRO     - Change: field_action(save) to
+                               field_action(save_)
+                       Change: noinput(save) to noinput(save_)
+      XLABLE.DBA     - Change: field(save, to field(save_,
+      XRESIZE.PRO    - Delete: all but goal section
+      XSLIDES.PRO    - Change: loadpic(string,row,col,row,col,   to:
+                       loadpic(string,integer,integer,integer,integer,
+
+   All Project Demos:
+
+      Move:
+
+       - include "gdoms.pro"     before   all other include files
+       - include "gglobs.pro"    before   include "tdoms.pro" and
+                                 before   domains section
+       - global predicates       before   domains
+       - name the database by changing database to database - xdbname
+
+
+   Also, if you use TICKS.OBJ, you should change to the following
+   TICKS.PRO.  Just compile it to an .OBJ file and link it in.
+
+
+   TICKS.PRO:
+
+      project "dummy"
+
+      /*
+          Ticks(0-32767) gives the time in hundreds of a second which
+          the current process shall be suspended.  It can be useful,
+          for example, to make a precise timing between two dial
+          pulses.
+      */
+
+      global predicates
+ 
+      ticks(real) - (i) language c as "ticks_0"
+      ticks2(real) - (i)
+      nondeterm repeat
+      determ get_wait_time(real,real) - (i,o)
+
+      clauses
+
+        ticks(Pause_time):-
+          time(_,Min,Sec,Hund),
+          Time_start = Min * 6000.0 + Sec * 100.0 + Hund,
+          Time_to_stop = Time_start + Pause_time,
+          get_wait_time(Time_to_stop, End_time),
+          ticks2(End_time).
+
+        ticks2(End_time):-
+          repeat,
+          time(_,Min,Sec,Hund),
+          Tw2 = Min * 6000.0 + Sec * 100.0 + Hund,
+          Tw2 >= End_time, !.
+
+        get_wait_time(Time_to_stop,End_time):-
+          Time_to_stop >= 360000,   % Pause time passes the hour mark
+          repeat,
+          time(_,M,_,_),
+          M = 0,
+          End_time = Time_to_stop - 360000,
+          !.
+        get_wait_time(End_time,End_time).
+
+        repeat.
+        repeat:-repeat.
+
+        
+5.  ENABLING HIGH-RESOLUTION EGA+ TEXT MODES
+--------------------------------------------
+  (Note: These directions are NOT in the manual!)
+   
+  In order to enable high-resolution text modes, the environment
+  variable TPROLOG must have a -X.  With TPROLOG set, it will then be
+  possible to use the high-resolution text modes.  There are three
+  ways to set the TPROLOG environment variable:
+
+  1.  Add TPROLOG = -X in the DOS environment:
+        set TPROLOG = -X ....(other options go here)
+  2.  Add the -X option to the command line:
+        prolog -X
+  3.  Load a *.SYS configuration file that was saved with the high-
+      resolution text mode installed.
+
+  Selecting a HiRes textmode without the right TPROLOG variable
+  will activate a popup window:
+
+                +-----------------------------------+
+                | please consult the README file    |
+                | how to enable high resolution     |
+                | screen modes.                     |
+                +-----------------------------------+
+
+
+6.  IMPORTANT INFORMATION
+-------------------------
+ 1. BE CAREFUL NOT TO MIX FILES FROM 1.x WITH THE FILES FROM 2.x!
+
+ 2. Please note in Chapter 17 (BGI Graphics) that we still support 1.1
+    Graphics.  Note:  The Turtle Graphics system is NOT compatible with 
+    the BGI, so you must choose one or the other for your application!
+
+ 3. The following is a complete list of the command-line
+    parameters available:
+
+       -E<FileName>       :  Loads a file into the editor
+       -S<SYS-File>       :  The .SYS file to be used. (If there 
+                             is a PROLOG.SYS, it will be used.)
+       -C[-]              :  Turn snowchecking on [off]
+       -X[-]              :  Enable [Disable] High-Res text modes
+                             This option must be set in order to
+                             be able to use high-res text modes.
+
+ 4. All environmental variables are collected into the TPROLOG
+    variable.
+
+     Syntax:
+
+       Set TPROLOG=-E<FileName> -S<SYS-File> -C[-] -X[-]
+
+       Option C means snowcheck 
+       Option X means high res textmodes
+
+    An option followed by a minus disables the option.
+
+    If a .SYS with the name PROLOG.SYS file exists on the current 
+    directory, it will be loaded instead of the file specified in
+    the TPROLOG environment variable.
+
+    If command-line parameters are used, they will override the
+    corresponding TPROLOG parameters.
+
+ 5. The PROSYS environment variable as described on page 7 of the
+    Reference Guide has been replaced by the TPROLOG environment
+    variable.
+
+ 6. The CGASNOWCHECK environment variable as described on page 41 of
+    the Reference Guide has been replaced by the TPROLOG environment 
+    variable.
+
+ 7. After running a program that uses BGI predicates, the message and 
+    trace windows might be gone.  They will automatically return.
+
+ 8. The modules within project definitions should be on separate lines
+    or separated by a '+' (for large projects).
+
+ 9. The libraries listed in the Link Options (under the main menu item
+    Options) must be preceded by a '+,' e.g.,:
+
+         To link in the BGI library, enter:
+
+                                +BGI
+
+         To link in C math emulation, enter:
+
+                            +EMU+MATHL+CL
+
+         You must, of course, include any paths if needed.
+
+
+    Note that all libraries must be preceded by a '+,' including the 
+    first one, and even if there is only one library listed.
+
+10. Some of the reference example programs demonstrate the use
+    of more than one standard predicate.
+
+
+7.  COMPILING ON A TWO-FLOPPY DRIVE SYSTEM
+------------------------------------------
+  For those using two floppy drives, in order to compile to an .EXE
+  file you must do ONE of the following:
+
+  Method 1:  External Linking of Object Modules
+
+  1.  In Drive A, place the BOOT disk.  In Drive B, place the RUN
+      disk.
+
+  2.  Change directory to Drive B and enter A:PROLOG.
+
+  3.  Remove BOOT disk from Drive A and insert a disk with your
+      source code (WORK disk).
+
+  4.  Select Setup/Directories from the main menu and change the
+      Current directory and the Obj directory to A:\.
+
+  5.  Load your source into the editor and select COMPILE/OBJ
+      from the main menu.  An object file and symbol file will be
+      generated onto your WORK disk.  (Once the source code is
+      loaded into the editor, a blank work disk can be used for
+      generating your .OBJ and .EXE files.)
+
+  6.  Remove WORK disk from Drive A and insert your DOS disk;
+      enter ALT-D to shell into DOS.  Once at the DOS prompt,
+      replace the DOS disk with your WORK disk.
+
+  7.  Replace the RUN disk in Drive B with the LIBRARY disk.
+
+  8.  Change Directory to Drive B.
+
+  9.  Enter:
+
+       TLINK INIT A:<source file name> [optional A:<other obj
+       files>] A:<source file name>.sym, A:<executable file
+       name>,, Prolog+ [Optional other library files]
+
+      For instance, here's a simple example:
+       tlink init a:myprog a:myprog.sym, a:myprog,,prolog
+
+      Linking in a BGI driver example:
+       tlink init a:mygraph a:mygraph.sym,mygraph,,prolog+bgi
+
+      To link in a specific driver or font:
+       tlink init a:mygraph a:cgaf a:mygraph.sym,mygraph,,prolog
+
+
+  Method 2:  Linking from within the environment
+
+  1.  You will need to make two new disks.  RUN1 disk contains
+      only the PROLOG.OVL, PROLOG.ERR and PROLOG.HLP files from
+      the RUN disk (described in Section 2 under INSTALLF.BAT). 
+      The second disk, LIBRARY1, contains only the PROLOG.LIB and
+      INIT.OBJ files.
+
+  2.  In Drive A, place the BOOT disk.  In drive B, place the RUN1
+      disk.
+
+  3.  Change directory to Drive B and enter A:PROLOG.
+
+  4.  Remove the BOOT disk from Drive A and insert a disk with your
+      source code (WORK disk) and load your source file into the
+      editor.
+
+  5.  Select Setup/Directories from the main menu and change the
+      Turbo directory and the Obj directory to A:\.
+
+  6.  Remove the WORK disk from Drive A and insert your LIBRARY1 disk.
+
+  7.  Select Compile/Exe from the main menu.
+
+
+8.  HOW TO UNPACK/DE-ARCHIVE .ARC FILES
+---------------------------------------
+  For instructions on how to de-archive the .ARC files on the
+  INSTALLATION/README disk, simply execute the UNPACK program
+  without giving any command line parameters:
+
+        UNPACK
+
+  The UNPACK utility will display a screen of instructions for you.
+  However, the installation program (INSTALLF.BAT or INSTALLH.BAT) 
+  automatically calls UNPACK to unpack the files when installing them 
+  on your floppy or hard disk.
+
+
+9.  CONVERTING .BGI FILES TO .OBJ FILES
+---------------------------------------
+  On the HELP/BGI disk you will find several files with .BGI and .CHR
+  extensions.  These are used when creating BGI graphics.  If you
+  intend to create a stand-alone .EXE program that uses the BGI
+  graphics, and you want to link in a specific driver or character
+  font, you will need to convert these files to .OBJ files.  Otherwise,
+  as long as the .BGI and .CHR files can be found by the .EXE file
+  (either in the same directory, or on a path, etc.), they will be
+  loaded at run time.  
+
+  All the .BGI files have already been converted to .OBJ and are in 
+  BGI.LIB.  The utility BGIOBJ.EXE (on the COMPILER disk) is provided
+  so you can convert a specific driver or character font (.BGI or .CHR
+  file) to object code.  To convert a file, simply type BGIOBJ followed
+  by the name of the file you want to convert.  You will also need to
+  add the /F command line option.  (This is because Turbo Prolog
+  creates large model programs, which use FAR calls.  The /F means use
+  FAR calls in the .OBJ file created.)  As an example, suppose you want
+  to convert the CGA driver (CGA.BGI) to an .OBJ file (in this case
+  CGAF.OBJ).  To do so, you would type in the following and press
+  return:
+
+        BGIOBJ /F CGA
+
+  or for a character font such as GOTHIC, you would type:
+
+        BGIOBJ /F GOTH
+
+  The resulting files created would be CGAF.OBJ and GOTHF.OBJ,
+  respectively (again, the F means "use FAR calls").  When the
+  conversion is complete, information will be printed out, such as
+  the public name of the driver or character font.  You will need
+  to list these public names at the beginning of your program
+  (As an example, see GRDEMO.PRO.).
+
+  Further instructions can be obtained by executing the BGIOBJ
+  utility without any command-line parameters.
+
+
+10.  WHERE TO FIND THE 1.1 GRAPHICS PREDICATES
+----------------------------------------------
+  Graphics predicates supported for compatibility with versions 1.XX 
+  are listed at the end of Chapter 17 in the User's Guide.
+       
+
+11.  CORRECTIONS TO APPENDIX C: ERROR MESSAGES
+----------------------------------------------
+  For a complete listing of error messages refer to PROLOG.ERR. 
+
+  Error Messages Removed:
+ 
+   225 String name expected.
+   699 Internal system error.
+

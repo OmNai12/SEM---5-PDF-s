@@ -1,0 +1,7 @@
+xpositive("sollowen_gland")
+xpositive("runny_nose")
+xpositive("headache")
+xpositive("fever")
+xnegative("chills")
+xnegative("body_ache")
+xnegative("cough")

@@ -1,0 +1,41 @@
+/*
+   Copyright (c) 1986, 88 by Borland International, Inc
+/*
+DOMAINS
+  LIST = INTEGER*
+
+PREDICATES
+  append(LIST,LIST,LIST)
+  member(INTEGER,LIST)
+  reverse(LIST,LIST)
+  rev(LIST,LIST,LIST)
+  genl(INTEGER,LIST)
+  for(INTEGER,INTEGER,INTEGER)
+  timer
+
+CLAUSES
+*/
+  append([],L,L).
+  append([X|L1],L2,[X|L3]):-append(L1,L2,L3).
+
+  member(X,[X|_]).
+  member(X,[_|L]):-member(X,L).
+
+  reverse(L1,L2):-rev(L1,[],L2).
+
+  rev([],L,L):-!.
+  rev([H|T],L1,L2):-rev(T,[H|L1],L2).
+
+  genl(0,[]):-!.
+  genl(N,[N|L]):-N1 is N-1, genl(N1,L).
+
+  for(I,I,_).
+  for(I,Start,Stop):-
+	Start<Stop,Start1 is Start+1,for(I,Start1,Stop).
+
+  timer:-
+	time(H1,M1,S1,D1),
+	genl(10,L),reverse(L,_),
+	time(H2,M2,S2,D2),
+	Time is (D2-D1)+100*( (S2-S1) + 60*( (M2-M1) +60*(H2-H1) ) ),
+	write("Time = ",Time,"/100 Sec" ),nl.

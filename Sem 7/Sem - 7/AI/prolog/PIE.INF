@@ -1,0 +1,641 @@
+/*****************************************************************************
+			Prolog Inference Engine
+			=======================
+
+   Copyright (c) 1986, 88 by Borland International, Inc
+
+   Module pie.inf: The inferenge engine
+*****************************************************************************/
+
+/*****************************************************************************
+		General Help predicates
+*****************************************************************************/
+
+PREDICATES
+  listlen(TERML,INTEGER,INTEGER) % Gives the length of a list
+  listlen(STERML,INTEGER,INTEGER)
+  member(E,ENV)			 % The god old member
+  nondeterm repeat		 % The even older repeat
+  getfilename(TERM,STRING)	 % construct the filename with extension
+
+CLAUSES
+  listlen([],N,N):-!.
+  listlen([_|T],SUB,N):-SUB1=SUB+1,listlen(T,SUB1,N).
+
+  member(X,[X|_]):-!.
+  member(X,[_|L]):-member(X,L).
+
+  repeat.
+  repeat:-repeat.
+
+  getfilename(atom(S),FILENAME):-!,
+	concat(S,".pie",FILENAME).
+  getfilename(str(S),FILENAME):- 
+        fronttoken(S,_,""),!,
+	concat(S,".pie",FILENAME).
+  getfilename(str(FILENAME),FILENAME).
+
+/*****************************************************************************
+	Expression evaluation
+*****************************************************************************/
+
+PREDICATES
+  eval(TERM,REFINT)
+
+CLAUSES
+  eval(T,_):-free(T),!,fail.  % or 'exit(1020)' free var in expression
+  eval(int(I),I):-!.
+  eval(cmp("+",[T1,T2]),R):- !, eval(T1,R1),eval(T2,R2),R=R1+R2.
+  eval(cmp("-",[T1,T2]),R):- !, eval(T1,R1),eval(T2,R2),R=R1-R2.
+  eval(cmp("*",[T1,T2]),R):- !, eval(T1,R1),eval(T2,R2),R=R1*R2.
+  eval(cmp("/",[T1,T2]),R):- !, eval(T1,R1),eval(T2,R2),R=R1 div R2.
+  eval(cmp("-",[T1]),R):-    !, eval(T1,R1),R=-R1.
+  eval(cmp("mod",[T1,T2]),R):- !, eval(T1,R1),eval(T2,R2),R=R1 mod R2.
+  eval(cmp("abs",[T]),R):-!,eval(T,R1),R=abs(R1).
+
+
+/*****************************************************************************
+	File system
+*****************************************************************************/
+
+DATABASE - seetell
+  determ seeing_name(STRING)
+  determ telling_name(STRING)
+
+PREDICATES
+  tell(STRING)
+  telling(STRING)
+  told
+  see(STRING)
+  seeing(STRING)
+  seen
+
+CLAUSES
+  tell(FILENAME):-
+	closefile(telling),
+	openwrite(telling,FILENAME),
+	writedevice(telling),
+	retractall(telling_name(_)),
+	assert(telling_name(FILENAME)).
+
+  telling(FILENAME):-
+	telling_name(FILENAME).
+
+  told:-
+	retract(telling_name(_)),!,
+	closefile(telling).
+  told.
+
+  see(FILENAME):-
+	closefile(seeing),
+	openread(seeing,FILENAME),
+	readdevice(seeing),
+	retractall(seeing_name(_)),
+	assert(seeing_name(FILENAME)).
+
+  seeing(FILENAME):-
+	seeing_name(FILENAME).
+
+  seen:-
+	retract(seeing_name(_)),!,
+	closefile(seeing).
+  seen.
+
+/*****************************************************************************
+		Handle clause listing
+*****************************************************************************/
+
+PREDICATES
+  list
+  list(STRING)
+  list(STRING,INTEGER)
+  wclause(STERM,STERM)
+  handle_list(TERML)
+
+CLAUSES
+  % list all clauses in the database
+  list:-clause(A,B),wclause(A,B),write(".\n"),fail.
+  list.
+
+  % list  pred for all arities
+  list(ID):-
+	clause(cmp(ID,TERML),BODY),
+	wclause(cmp(ID,TERML),BODY),
+	write(".\n"),
+	fail.
+  list(_).
+
+  % list  pred/arity
+  list(ID,N):-
+	clause(cmp(ID,TERML),BODY),
+	listlen(TERML,0,N),
+	wclause(cmp(ID,TERML),BODY),
+	write(".\n"),
+	fail.
+  list(_,_).
+
+  wclause(HEAD,atom(true)):-!,wterm("list",HEAD).
+  wclause(HEAD,BODY):-wterm("list",cmp(":-",[HEAD,BODY])).
+
+  handle_list([]):-!,list.
+  handle_list([atom(Pid)]):-!,list(PID).
+  handle_list([cmp("/",[atom(PID),int(N)])]):-list(PID,N).
+
+/*****************************************************************************
+		Handle assert
+*****************************************************************************/
+
+PREDICATES
+  convhead(STERM,STERM)
+  ascla(CHAR,STERM,STERM)
+  assertclause(CHAR,STERM)
+
+CLAUSES
+  convhead(atom(ID),cmp(ID,[])):-!.
+  convhead(HEAD,HEAD).
+
+  ascla('a',H,B):-!,asserta(clause(H,B)).
+  ascla(_,H,B):-   assertz(clause(H,B)).
+
+  assertclause(C,cmp(":-",[HEAD,BODY])):-!,
+	convhead(HEAD,HEAD1),
+	ascla(C,HEAD1,BODY).
+  assertclause(C,HEAD):-
+	convhead(HEAD,HEAD1),
+	ascla(C,HEAD1,atom(true)).
+
+/*****************************************************************************
+		Handle Consult
+*****************************************************************************/
+
+PREDICATES
+  cons(STRING)
+  sav(STRING)
+  parse_clauses(TOKL)
+
+CLAUSES
+  parse_clauses(TOKL):-
+	s_lowerterm(TOKL,TOKL1,TERM),!,
+	assertclause('0',TERM),
+	parse_clauses(TOKL1).
+  parse_clauses(_).
+
+  cons(FIL):-
+	file_str(FIL,TXT),
+	tokl(0,TXT,TOKL),!,
+	parse_clauses(TOKL).
+  cons(_).
+
+  sav(FIL):-
+	openwrite(temp,FIL),
+	writedevice(temp),
+	list,
+	closefile(temp).
+
+/*****************************************************************************
+		Handle ReConsult
+*****************************************************************************/
+
+PREDICATES
+  recons(STRING)
+  recons_parse(TOKL)
+  recons_newclause(STERM)
+  recons_newclause_change(STERM,STERM)
+
+DATABASE - reconsulted
+  removed(STRING)
+
+CLAUSES
+  recons_newclause_change(cmp(PID,TERML),BODY):-
+	not(removed(PID)),
+	retractall(clause(cmp(PID,_),_)),
+	assert(removed(PID)),
+	fail;
+	ascla('0',cmp(PID,TERML),BODY).
+
+  recons_newclause(cmp(":-",[HEAD,BODY])):-!,
+	convhead(HEAD,HEAD1),
+	recons_newclause_change(HEAD1,BODY).
+  recons_newclause(HEAD):-
+	convhead(HEAD,HEAD1),
+	recons_newclause_change(HEAD1,atom(true)).
+
+  recons_parse(TOKL):-
+	s_lowerterm(TOKL,TOKL1,TERM),!,
+	recons_newclause(TERM),
+	recons_parse(TOKL1).
+  recons_parse(_).
+
+  recons(FIL):-
+	retractall(_,reconsulted),
+	file_str(FIL,TXT),
+	tokl(0,TXT,TOKL),!,
+	recons_parse(TOKL).
+  recons(_).
+
+/*****************************************************************************
+		Handle editor
+*****************************************************************************/
+
+PREDICATES
+  ed
+  ed(STRING)
+  ed(STRING,INTEGER)
+  handle_edit(TERML)
+
+CLAUSES
+  ed:- 	openwrite(temp,"temp.$$$"),
+	writedevice(temp),
+	list,
+	closefile(temp),
+	file_str("temp.$$$",TXT),
+	makewindow(1,2,23,"CLAUSES",5,5,15,70),
+	edit(TXT,TXT1),
+	removewindow,
+	shiftwindow(OLD),shiftwindow(1),shiftwindow(OLD),
+	TXT1><TXT,
+	file_str("temp.$$$",TXT1),
+	recons("temp.$$$"),!,
+	deletefile("temp.$$$").
+  ed.
+
+  ed(FILENAME):-
+	file_str(FILENAME,TXT),
+	makewindow(1,2,23,"CLAUSES",5,5,15,70),
+	edit(TXT,TXT1),
+	removewindow,
+	shiftwindow(OLD),shiftwindow(1),shiftwindow(OLD),
+	file_str(FILENAME,TXT1),
+	recons(FILENAME),!.
+  ed(_).
+
+  ed(ID,N):-
+  	FILENAME="temp.$$$",
+  	openwrite(temp,FILENAME),
+	writedevice(temp),
+	list(ID,N),
+	closefile(temp),
+	file_str(FILENAME,TXT),
+	deletefile("temp.$$$"),
+	makewindow(1,2,23,"CLAUSES",5,5,15,70),
+	edit(TXT,TXT1),
+	removewindow,
+	shiftwindow(OLD),shiftwindow(1),shiftwindow(OLD),
+	TXT1><TXT,
+	file_str(FILENAME,TXT1),
+	recons(FILENAME),!.
+  ed(_,_).
+
+  handle_edit([]):-!,
+	ed.
+  handle_edit([cmp("/",[atom(PID),int(N)])]):-
+	bound(PID),bound(N),!,
+	ed(PID,N).
+  handle_edit([TERM]):-!,
+	bound(TERM),getfilename(TERM,FILENAME),ed(FILENAME).
+
+/*****************************************************************************
+	Misc help predicates for implementing standard predicates
+*****************************************************************************/
+
+PREDICATES
+  eeq(TERM,TERM)		% True equality
+  eeqterml(TERML,TERML)
+  list_terml(TERM,TERML)	% Conversion between list and TERML
+  retractclause(STERM,STERM)	% Used to give a deterministic retract
+  nondeterm handle_op(REFINT,REFSYMB,REFSYMB).
+  functor(TERM,REFSYMB,REFINT)
+  arg(INTEGER,TERML,TERM)
+  writeterml(DISPLAY,TERML)
+
+CLAUSES
+  eeq(T1,T2):-free(T1),free(T2),T1=int(0),T2=int(1),!,fail.
+  eeq(T1,T2):-free(T1),free(T2),!.
+  eeq(T1,T2):-free(T1),!,fail; free(T2),!,fail.
+  eeq(cmp(ID,TERML1),cmp(ID,TERML2)):-!,eeqterml(TERML1,TERML2).
+  eeq(list(H1,T1),list(H2,T2)):-!,eeq(H1,H2),eeq(T1,T2).
+  eeq(X,X).
+
+  eeqterml([],[]):-!.
+  eeqterml([H1|T1],[H2|T2]):-
+	eeq(H1,H2),eeqterml(T1,T2).
+
+  list_terml(nill,[]):-!.
+  list_terml(list(H,T),[H|TT]):-list_terml(T,TT).
+
+  retractclause(HEAD,BODY):-
+	retract(clause(HEAD,BODY)),!.
+
+  handle_op(PRIOR,XFY,OP):-
+	bound(PRIOR),bound(XFY),bound(OP),!,
+	PRIOR1=PRIOR,XFY1=XFY,OP1=OP,
+	retractall(op(_,_,OP1)),
+	assert(op(PRIOR1,XFY1,OP1)).
+  handle_op(PRIOR,XFY,OP):-
+	op(P1,A1,O1),
+	P1=PRIOR,A1=XFY,O1=OP.
+
+  functor(cmp(ID,TERML),ID,N):-
+	bound(N),!,bound(ID),listlen(TERML,0,N).
+  functor(cmp(ID,TERML),ID,N):-!,
+	bound(ID),free(N),
+	listlen(TERML,0,N1),N=N1.
+  functor(atom(S),S,0):-!.
+
+  arg(1,[X|_],X):-!.
+  arg(N,[_|T],X):-
+	N1=N-1,
+	arg(N1,T,X).
+
+  writeterml(_,[]):-!.
+  writeterml(DISPLAY,[H|T]):-wterm(DISPLAY,H),writeterml(DISPLAY,T).
+
+/*****************************************************************************
+	Variable name generator for assert of rules
+*****************************************************************************/
+
+DATABASE - varno
+  determ current_var(INTEGER)
+
+PREDICATES
+  reset_vargenerator
+  createVar(TERM,ENV,STRING)
+  lookup_termid(TERM,ENV,STRING)
+  get_next_unused(ENV,INTEGER,INTEGER,STRING)
+  vid_exist(STRING,ENV)
+
+CLAUSES
+  reset_vargenerator:-
+	retractall(current_var(_)),
+	assert(current_var(0)).
+
+  createVar(TERM,ENV,ID):-
+	lookup_termid(TERM,ENV,ID),!.
+  createVar(TERM,ENV,NEWID):-
+	retract(current_var(NO)),
+	NO1=NO+1,
+	get_next_unused(ENV,NO1,NO2,NEWID),
+	member(e(NEWID,TERM),ENV),
+	assert(current_var(NO2)).
+
+  lookup_termid(_,ENV,_):-free(ENV),!,fail.
+  lookup_termid(TERM,[e(ID,TERM1)|_],ID):-
+	eeq(TERM,TERM1),!.
+  lookup_termid(TERM,[_|ENV],ID):-
+	lookup_termid(TERM,ENV,ID).
+
+  get_next_unused(ENV,NO,NO,NEWID):-
+	str_int(ID,NO),concat("_",ID,NEWID),
+	not(vid_exist(NEWID,ENV)),!.
+  get_next_unused(ENV,NO1,NO3,ID):-
+	NO2=NO1+1,
+	get_next_unused(ENV,NO2,NO3,ID).
+
+  vid_exist(_,ENV):-free(ENV),!,fail.
+  vid_exist(VID,[e(VID,_)|_]):-!.
+  vid_exist(VID,[_|L]):-vid_exist(VID,L).
+
+/*****************************************************************************
+	Implementation of trace
+*****************************************************************************/
+
+ifdef implement_trace
+PREDICATES
+  showtrace(STRING,STRING,TERML)
+  nondeterm trace_call(STRING,TERML)
+  nondeterm report_redo(STRING,TERML)
+
+CLAUSES
+  trace_call(PID,TERML):-not(traceflag),!,call(PID,TERML).
+  trace_call(PID,TERML):-
+	showtrace("CALL:   ",PID,TERML),
+	call(PID,TERML),
+	report_redo(PID,TERML),
+	showtrace("RETURN: ",PID,TERML).
+  trace_call(PID,TERML):-
+	showtrace("FAIL:   ",PID,TERML),
+	fail.
+
+  report_redo(_,_).
+  report_redo(PID,TERML):-
+	showtrace("REDO:   ",PID,TERML),
+	fail.
+
+  showtrace(STR,PID,TERML):-
+	shiftwindow(OLD),shiftwindow(3),
+	attribute(15),write(STR),attribute(7),
+	wterm("write",cmp(PID,TERML)),nl,
+	shiftwindow(OLD).
+
+elsedef  % call the predicate "call" directly
+
+CONSTANTS
+  trace_call = call
+enddef
+
+/*****************************************************************************
+	The inference engine
+*****************************************************************************/
+
+PREDICATES
+  % nondeterm call(STRING,TERML) declared as first predicate due to memory problems
+  unify_term(TERM,STERM,ENV)
+  unify_terml(TERML,STERML,ENV)
+  nondeterm unify_body(STERM,ENV,INTEGER)
+
+  handle_assert(CHAR,STERM,ENV)
+  nondeterm handle_retract(TERM)
+
+CLAUSES
+  handle_assert(Poscode,TERM,ENV):-
+	unify_term(CALL,TERM,ENV),
+	reset_vargenerator,
+	unify_term(CALL,STERM,ENV),
+	assertclause(Poscode,STERM),
+	fail.	% Remove generated identifiers from environment
+  handle_assert(_,_,_).
+
+  handle_retract(cmp(":-",[cmp(ID,TERML),BODY])):-
+	bound(ID),!,
+	clause(cmp(ID,STERML),SBODY),
+	free(ENV),
+	unify_terml(TERML,STERML,ENV),
+	unify_term(BODY,SBODY,ENV),
+	retractclause(cmp(ID,STERML),SBODY).
+
+  handle_retract(cmp(":-",[HEAD,BODY])):-free(HEAD),!,
+	clause(SHEAD,SBODY),
+	free(ENV),
+	unify_term(HEAD,SHEAD,ENV),
+	unify_term(BODY,SBODY,ENV),
+	retractclause(SHEAD,SBODY).
+
+  handle_retract(cmp(ID,TERML)):-
+	clause(cmp(ID,TERML1),atom(true)),
+	free(ENV),
+	unify_terml(TERML,TERML1,ENV),
+	retractclause(cmp(ID,TERML1),atom(true)).
+
+
+  unify_terml([],[],_):-!.
+  unify_terml([TERM1|TL1],[TERM2|TL2],ENV):-
+	unify_term(TERM1,TERM2,ENV),unify_terml(TL1,TL2,ENV).
+
+  unify_term(TERM,var(ID),ENV):-free(ID),free(TERM),!,createVar(TERM,ENV,ID).
+  unify_term(_,STerm,_):-bound(STerm),Sterm=var("_"),!.
+  unify_term(Term,var(ID),ENV):-bound(ID),!,member(e(ID,Term1),ENV),Term1=Term.
+  unify_term(int(I),int(I),_):-!.
+  unify_term(atom(A),atom(A),_):-!.
+  unify_term(str(S),str(S),_):-!.
+  unify_term(char(C),char(C),_):-!.
+  unify_term(list(H1,T1),list(H2,T2),ENV):-!,
+	unify_term(H1,H2,ENV),unify_term(T1,T2,ENV).
+  unify_term(nill,nill,_):-!.
+  unify_term(cmp(ID,L1),cmp(ID,L2),ENV):-!,unify_terml(L1,L2,ENV).
+
+  unify_body(atom(true),_,_):-!.
+  unify_body(cmp(",",[TERM1,TERM2]),ENV,BTOP):-!,
+	unify_body(TERM1,ENV,BTOP),unify_body(TERM2,ENV,BTOP).
+  unify_body(atom("!"),_,BTOP):-!,cutbacktrack(BTOP).
+  unify_body(cmp(";",[TERM,_]),ENV,BTOP):-unify_body(TERM,ENV,BTOP).
+  unify_body(cmp(";",[_,TERM]),ENV,BTOP):-!,unify_body(TERM,ENV,BTOP).
+  unify_body(cmp("not",[TERM]),ENV,_):-
+	getbacktrack(BTOP),unify_body(TERM,ENV,BTOP),!,fail.
+  unify_body(cmp("not",_),_,_):-!.
+  unify_body(cmp("call",[TERM]),ENV,_):-!,
+	getbacktrack(BTOP),unify_body(TERM,ENV,BTOP).
+  unify_body(cmp("assert",[TERM]),ENV,_):- !,handle_assert('0',TERM,ENV).
+  unify_body(cmp("asserta",[TERM]),ENV,_):-!,handle_assert('a',TERM,ENV).
+  unify_body(cmp("assertz",[TERM]),ENV,_):-!,handle_assert('z',TERM,ENV).
+  unify_body(cmp(PID,TERML),ENV,_):-
+	unify_terml(CALL,TERML,ENV),trace_call(PID,CALL).
+  unify_body(var(ID),ENV,_):-!,
+	member(e(ID,TERM),ENV),bound(TERM),
+	TERM=cmp(PID,TERML), trace_call(PID,TERML).
+  unify_body(atom(PID),_,_):-
+	trace_call(PID,[]).
+
+
+  call("fail",[]):-!,fail.
+
+  call("repeat",[]):-!,repeat.
+
+  call("write",TERML):-!, writeterml("write",TERML).
+
+  call("nl",[]):-!, nl.
+
+  call("display",TERML):-!,writeterml("display",TERML).
+
+  call("read",[TERM]):-!,
+	readln(L),
+  	tokl(0,L,TOKL),
+	s_term(TOKL,_,STERM),
+	free(E),
+	unify_term(TERM,STERM,E).
+
+  call("readln",[str(L1)]):-!,
+	readln(L),L1=L.
+
+  call("readchar",[char(CH)]):-!,
+	readchar(CH1),CH=CH1.
+
+  call("help",[]):-!,
+	file_str("pie.hlp",HELPINF),
+	makewindow(1,7,7,"Help Information",0,0,24,80),
+	display(HELPINF),
+	removewindow,
+	shiftwindow(1),
+	shiftwindow(2).
+
+  call("retract",[TERM]):-!,handle_retract(TERM).
+
+  call("tell",[str(FILENAME)]):-!,bound(FILENAME),tell(FILENAME).
+  call("telling",[str(FILENAME)]):-!,telling(FILENAME1),FILENAME=FILENAME1.
+  call("told",[]):-!,told.
+
+  call("see",[str(FILENAME)]):-!,bound(FILENAME),see(FILENAME).
+  call("seeing",[str(FILENAME)]):-!,seeing(FILENAME1),FILENAME=FILENAME1.
+  call("seen",[]):-!,seen.
+
+  call("=..",[cmp(ID,TERML),list(atom(ID),LIST)]):-!,
+	list_terml(LIST,TERML).
+
+  call("arg",[int(N),cmp(FID,TERML),X]):-!,
+	bound(N),bound(FID),N>0,
+	arg(N,TERML,X).
+
+  call("functor",[TERM,atom(FID),int(ARITY)]):-!,
+	functor(TERM,FID,ARITY).
+
+  call("clause",[HEAD,BODY]):-!,
+	clause(SHEAD,SBODY),
+	free(ENV),
+	unify_term(HEAD,SHEAD,ENV),
+	unify_term(BODY,SBODY,ENV).
+
+  call("concat",[str(A),str(B),str(C)]):-!,
+	concat(A,B,C).
+
+  call("str_int",[str(STR),int(I)]):-!,
+	str_int(STR,I).
+
+  call("str_atom",[str(STR),atom(SYMB)]):-!,
+	STR=SYMB.
+
+  call("is",[int(Res),T2]):-!, eval(T2,Res).
+
+  call("==",[T1,T2]):-!, eeq(T1,T2).
+  call("\\==",[T1,T2]):-!, not(eeq(T1,T2)).
+
+  call("=",[X,X]):-!.
+  call("\\=",[X,Y]):-!,not(X=Y).
+  call("<",[T1,T2]):-!,eval(T1,X),eval(T2,Y),X<Y.
+  call(">",[T1,T2]):-!,eval(T1,X),eval(T2,Y),X>Y.
+  call("=<",[T1,T2]):-!,eval(T1,X),eval(T2,Y),X<=Y.
+  call(">=",[T1,T2]):-!,eval(T1,X),eval(T2,Y),X>=Y.
+  call("><",[T1,T2]):-!,eval(T1,X),eval(T2,Y),X><Y.
+
+  call("integer",[TERM]):-!,bound(TERM),TERM=int(_).
+
+  call("var",[TERM]):-!,free(TERM).
+  call("nonvar",[TERM]):-!,bound(TERM).
+
+  call("list",TERML):-handle_list(TERML).
+
+  call("edit",TERML):-handle_edit(TERML).
+
+ifdef implement_trace
+  call("trace",_):-traceflag,!.
+  call("trace",_):-!,assert(traceflag).
+  call("notrace",_):-!,retractall(traceflag).
+enddef
+
+  call("time",[int(H),int(M),int(S),int(HH)]):-!,
+	free(H),free(M),free(S),free(HH),
+	time(H,M,S,HH).
+
+  call("scr_char",[int(ROW),int(COL),char(CHAR)]):-!,
+	bound(ROW), bound(COL),
+	scr_char(ROW,COL,CHAR).
+
+  call("char_int",[char(CH),int(INT)]):-!,
+  	char_int(CH,INT).
+
+  call("consult",[TERM]):-!,
+	bound(TERM),getfilename(TERM,FILENAME),cons(FILENAME).
+
+  call("reconsult",[TERM]):-!,
+	bound(TERM),getfilename(TERM,FILENAME),recons(FILENAME).
+
+  call("save",[TERM]):-!,
+	bound(TERM),getfilename(TERM,FILENAME),sav(FILENAME).
+
+  call("op",[int(PRIOR),atom(ASSOC),atom(OP)]):-!,
+	handle_op(PRIOR,ASSOC,OP).
+
+  call(ID,TERML):-
+	getbacktrack(BTOP),
+	clause(cmp(ID,TERML1),BODY),
+	free(ENV),
+	unify_terml(TERML,TERML1,ENV),
+	unify_body(BODY,ENV,BTOP).

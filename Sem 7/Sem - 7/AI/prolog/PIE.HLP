@@ -1,0 +1,94 @@
+
+		Prolog Inference Engine / Help Information
+		==========================================
+
+This program illustrates how to handle Prolog-like rules in
+Turbo Prolog, how to parse and assert them, and how to build the
+inference engine.
+
+We have included in it most of the popular interpreted predicates.
+However, there are a few things that were implemented in a way
+different from most interpreters. 
+
+  - Strings are not lists of integers but a separate type instead.
+
+  - Characters have their own type
+
+  - The term reader reads only to an end-of-line.
+
+  - Spypoints are not implemented, (trace are).
+
+  - get, get0, tab etc are not implemented, (read, readln, readchar are)
+
+  - we do not support 1.2.3.[] notation for lists neither are list's
+    allowed as arguments to functor and univ
+
+A list of the implemented standard predicates are:
+
+true				- success
+fail				- fail
+repeat				- succeeds forever
+write(TERM*)			- writes out a list of arguments
+nl				- outputs a newline
+display(TERM*)			- outputs functors in prefix notation
+read(TERM)			- read a term
+readln(LINE)			- read a line into a string
+readchar(CHAR)			- read a character
+help				- help information
+retract(TERM)			- retract a term
+tell(FILENAME)			- redirect output to this file
+telling(FILENAME)		- return the current output file
+told				- close the current output file
+see(FILENAME)			- redirect input to this file
+seeing(FILENAME)		- return the current input file
+seen				- close the current input file
+TERM =.. LIST			- univ; conversion between term and list
+arg(N,TERM,ARGn)		- unify ARGn with n'th argument of TERM
+functor(TERM,FUNCTOR,ARITY)	- return functor and arity of term or build new
+clause(HEAD,BODY)		- return clauses from the database
+concat(STRING,STRING,STRING)	- concatenation of strings
+str_int(STRING,INT)		- conversion between a string and an integer
+str_atom(STRING,ATOM)		- conversion between a string and an atom
+INTEGER is EXPRESSION		- evaluation of expressions
+TERM == TERM			- testing for true equality
+TERM \== TERM			- not true equality
+TERM = TERM			- unify two terms
+TERM \= TERM			- test whether unify
+TERM < TERM			- integer less than
+TERM > TERM			- integer greater than
+TERM =< TERM			- less than or equal
+TERM >= TERM			- greater than or equal
+TERM >< TERM			- different evaluated values
+integer(TERM)			- is the term an integer
+var(TERM)			- is the term a free variable
+nonvar(TERM)			- is the term bound
+list				- list all clauses
+list(pred)			- list all clauses for pred
+list(pred/arity)		- list selected arity
+edit				- save all clauses, edit, reconsult
+edit(file)			- edit file, reconsult file
+edit(pred/arity)		- edit selected predicate
+trace				- turn on tracing
+notrace				- turn off tracing
+time(HOUR,MIN,SEC,HUNDERDS)	- return the system time
+scr_char(ROW,COL,CHAR)		- print a character at a selected position
+char_int(CHAR,INT)		- conversion between characters and integers
+consult(FILENAME)		- consult a file
+reconsult(FILENAME)		- reconsult a file
+save(FILENAME)			- save a file
+op(PRIORITY,ASSOC,OP)		- returns operators, or change operator
+
+GOAL , GOAL			- and
+GOAL ; GOAL			- or
+not(GOAL)			- negation
+!				- cut
+call(GOAL)			- call
+assert(RULE)			- assert
+asserta(RULE)			- asserta
+assertz(RULE)			- assertz
+VAR				- call pred which VAR is bound to
+
+If you don't like our interpreter you are free to modify it and add new
+standard predicates and features (In fact, Appendix K provides an 
+explanation of how the interpreter is implemented and how it may be
+extended.).
